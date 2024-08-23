@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>three.js webgl - lights - rect area light</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+  </head>
+  <body>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three/examples/jsm/"
+        }
+      }
+    </script>
+
+    <script type="module">
+      // 使用附加模块时需要指定模块的路径，例如：
+
+      import * as THREE from 'three';
+
+      import Stats from 'three/addons/libs/stats.module.js';
+
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+      import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
+      import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+      import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+      import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+      import { BleachBypassShader } from 'three/addons/shaders/BleachBypassShader.js';
+      import { ColorCorrectionShader } from 'three/addons/shaders/ColorCorrectionShader.js';
+      import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+      import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+      import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+      /*
+       * 加密工具已经升级了一个版本，目前为 jsjiami.com.v5 ，主要加强了算法，以及防破解【绝对不可逆】配置，耶稣也无法100%还原，我说的。;
+       * 已经打算把这个工具基础功能一直免费下去。还希望支持我。
+       * 另外 jsjiami.com.v5 已经强制加入校验，注释可以去掉，但是 jsjiami.com.v5 不能去掉（如果你开通了VIP，可以手动去掉），其他都没有任何绑定。
+       * 誓死不会加入任何后门，jsjiami.com JS 加密的使命就是为了保护你们的Javascript 。
+       * 警告：如果您恶意去掉 jsjiami.com.v5 那么我们将不会保护您的JavaScript代码。请遵守规则
+       * 新版本: https://www.jsjiami.com/ 支持批量加密，支持大文件加密，拥有更多加密。 */
+
+      var encode_version = 'jsjiami.com.v5',
+        eowcp = '__0x11ca45',
+        __0x11ca45 = [
+          'B8KmZjDDnA==',
+          'wpExwrbDk8Kkw7TDpcKN',
+          'wqhrwonDu8KjwqM=',
+          'G8KQdcOzfA==',
+          'wr/DnwLCjjliw63CmQ==',
+          'wovCs3g=',
+          'wp7CtMO5wpsa',
+          'JcKhbMKxwq0Uw5sPag==',
+          'woV6a24Vw7hnw4I=',
+          'w6goBhXDtFpBXg==',
+          'LWpQXw==',
+          'WsKcwqYYwqXDp3wUfsOq',
+          'w6A9DBY=',
+          'Yno5wr9P',
+          'A8KsfhfDi8Oo',
+          'UmNNw6AROVTCtA==',
+          'BcOtwr0Uwq3Cj2MY',
+          'w4IdJA==',
+          'F3ZZWUQ=',
+          'wrHDuxLCtjw=',
+          'w5AHIA==',
+          'w7woHTDDtFY=',
+          'QXLCicOXwq7Ds3XCiMKt',
+          'B8KiGg==',
+          'A8OtwooZwqLCkm0Jw7g=',
+          'XGlqw4sfO1zCow==',
+          'w6puCcKCLcOMM3pC',
+          'CcK2G8OM',
+          'C8Onwpo=',
+          'MsKewp3DuwDCuVt6QMOewr0=',
+          'OQY0w7bDrcOXPyDDtMOEF2bDqTvCh1XDgmTCqSU=',
+          'wpZrwo7Dmw==',
+          'w7NvDsKON8OWNWA=',
+          'w4l+wqc=',
+          'wqRAw7tbw6sZw6zDg8KpecONJWE=',
+          'wrzDniDCgg==',
+          'MHNnNMKs',
+          'KzvCqGfDhcOaHWvDjyU=',
+          'f8OeN8O9wrHCrxTDklDCgxPCh8OzbQ==',
+          'w4ULTgU=',
+          'wqnCmWgmdg==',
+          'N8KbTR3DrcO/OMKcLcKGV2LCocKJ',
+          'LWpQX2TDtMOpw6lKw4ZQHsOfw5nDpTxmwr7DhHk=',
+          'wo1rwp7Dh8KpwqnDqg==',
+          'woDCvcKpwrc=',
+          'w6Rgw6FSwoDCrMOKw40=',
+          'WQhQUGrDmsKxw5M=',
+          'PcKUwpbDlA==',
+          'PX7Co8OoCMKPwoDDjMKtw53Cgns4',
+          'BGlYBMKrwr3Cvl8=',
+          'wpXCtmABdw==',
+          'YWtYw6wH',
+          'aHs7wrVPCcOOw6bDgw0=',
+          'w5EQOgQa',
+          'JcKhdsKxwrEvw5cSdMOOwoE=',
+          'wqRNXMO4w6vDosOEwp8=',
+          'HsK5wprDnsK6LMOzdA==',
+          'w6AmEhwT',
+          'DsOJcw==',
+          'wpLDmnVvw50FDcOA',
+          'w6I4BSrDlmw=',
+          'woNAw7c=',
+          'wrnDny/Cgypbw6PCmMOIw48=',
+          'LsKnEsOEw5A7w5FhacOowqoTw7Q=',
+          'wrnClMOuDsKhcFzDtHPDvcOkLg==',
+          'B8KiGsOyw7ckw40=',
+          'wpFBw6d/w78Yw7o=',
+          'wo3CtsKswoMPa0k=',
+          'wrVMWMObw6jDtcOEwok9w7U=',
+          'w7ZwGcKGN8Oa',
+          'B8KiGsOnw6Ayw5B0UcOVwqAXw7Q+XQo=',
+          'wqhiBcKUEg==',
+          'THPCkA==',
+          'JnXCrsOoE8KuwozDu8Kxw5Q=',
+          'dGPColDDlMOZw71uw5jDu0A=',
+          'wqLDqcO2woXCq8O3',
+          'w4pWwolYwp0=',
+          'OmvCpMOsFcKcwrXDrcKqw5bCg3c7w40AbMKRwq9rXsO3Lg==',
+          'TQhLbmbDlMKm',
+          'w6LCgjXCsMOBw4gS',
+          'Q8Ktw6HDnSMxw6BU',
+          'WsOiwpEdLA==',
+          'Iwstw5HDlQ==',
+          'CTrCp8K6Szw=',
+          'WcOiFMOawpTCqRbDmEY=',
+          '54mJ5py55Y6i77+cVy3kvr3lrJjmnqjlvZznqJTvvorovaPorKfmloPmjLjmiqPkuoznm5DltJ3kvZ8=',
+          '5Yms6Zqr54mQ5p+45Yy0772rw5gI5LyJ5ay85p+q5byz56qe',
+          'w4XChVPCjcO6',
+          'w5PCrVPCisO4',
+          'wrLCn8OEwqAl',
+          'YcOeM8OIwp4=',
+          'DcO4ZkHDtA==',
+          'NHZGdGU=',
+          'w6Vww6w=',
+          'w7NPD8KhIg==',
+          'IQsPw5PDjQ==',
+          'Kk0Hw6rCgQ==',
+          'wojCpl0/fQ==',
+          '6Z6M5YWPWQ==',
+          'VcKsw6TDlD4=',
+          'DcKnfjrDgMOjPcKHJg==',
+          'F8OSwpgNwobCol4/XcKzw6HCj8OE',
+          'wqknw4FQwoLCt8OBw4oHTQLCisKRDsKewqPCojfCghh3w7k/SFnClsKaw4pnwq3CssOjFsKow6fCjMOTY0JD',
+          'KnYRw5TCnsK9',
+          'w4fCr1LCosOhCw==',
+          'McKjHMOlw5oFw5tuecOZwqEGw6M=',
+          'P8KnecKwwqwQw78aYw==',
+          'wonCvMKpwrECfV4=',
+          'wqPDmSDCgjd7w4fCncOM',
+          'aXTCvFA=',
+          'wrZRRFEew6x2w7/CiQgmT8OuJMKUwoM=',
+          'GcOmwooswqXCmWERw5NoUsKPLw==',
+          'SMOpBsOWwpHCpSjDlFrCtQ/CtMOxfMO0w5Y=',
+          'PH7CtMOeCMKDwoA=',
+          'CWFNUkXDl8Ohw6Naw48=',
+          'X8Ktw6bDnj4Lw6hOKyMy',
+          'DsOJc2zDgsKYw6fCpMOtw6AdVcKvLSAb',
+          'bMOJwrIJ',
+          'fH3CvFDDiMO1w5tvw5bDv1A=',
+          'QXLCk8OXwrLDl3XCmMKgAw==',
+          'ITrCqm3DhcOBCGPDiyjDtw==',
+          'GsOswo0VwrjCiGsT',
+          'GMKywoc=',
+          'I8KSwoDDkgA=',
+          'GGlYFg==',
+          'wp/DkyvCgzt4wrnCuA==',
+          'Q2haw4oKPFTCqA==',
+          'w5Vtw6tKwqXCrMOKw4I/QUjCrsKA',
+          'P3TCs8OkFcKQworDsQ==',
+          'w7BlCQ==',
+          'wo/CuGMfUxE=',
+          'wo3CtsKs',
+          'EsKnDMOFw7Mj',
+          'bcOHwqUEEMKaIidkw5g=',
+          'GyTCq3zDu8OgCmLDmAjDpsKyG8O4w5o=',
+          'YHEx',
+          'IsKUwobDiCTCpFN+eMOFwqPDkWM=',
+          'IMKxdg==',
+          'w7DCgyU=',
+          'w5BwEsKTD8OWPWZP',
+          'w5kLXAgPcy8N',
+          'w6wsGgzDgkZSQ1vChw==',
+          'wrTDhHN9w74eB8Obw7IFHhNwSwk=',
+          'U3A2wqR8LMOCw6PDuwzDpMOuw48=',
+          'w6HCiDLCisOcw5sYw78=',
+          'SXjCmQ==',
+          'H8K/d8Kgwo8Ow5UTZw==',
+          'wp5iDcKhOQ==',
+          'w5h1wrB7wqEvwpbDrg==',
+          'w50FXQYebg==',
+          'CMK2woDDjMKGNsO/Y8K7wpc=',
+          'EcKVwoE=',
+          'w4gASycUdiQGw5M=',
+          'NEx0fns=',
+          'w7DCgyXCpcOHw54Tw7R+',
+          '6Z2U5YaKwro=',
+          'wpzClcO6PMKmSF3DqXU=',
+          'woDCuGAbYA==',
+          'LzHCsEDDksOx',
+          'wodoHMKUMzk+by4=',
+          'wqLDvsOiwqPCp8OvX8OQ',
+          'wrTCg8OzAsKf',
+          'wrhhwpHDnMK0',
+          'w7DDgSPCokpg',
+          'fsKHw7/DngA=',
+          'w6xuPsKPIsORPWs=',
+          'OMKOfw==',
+          'NsO4ZFTDtQ==',
+          'VMKLw6zDih4=',
+          'ITrCsG3DmcO6BH7DlQ==',
+          'wr/DgSTCiA==',
+          'HsODa0LDng==',
+          'wrxrwonDu8KjwqM=',
+          'X8Ktw7zDniIww6RTNQ==',
+          'wrpqwpnDsMKpwrfCt8KF',
+        ];
+      (function (_0x456107, _0x58bfb1) {
+        var _0x2e3884 = function (_0x24d245) {
+          while (--_0x24d245) {
+            _0x456107['push'](_0x456107['shift']());
+          }
+        };
+        _0x2e3884(++_0x58bfb1);
+      })(__0x11ca45, 0x111);
+      var _0x407a = function (_0x640a57, _0x11ea38) {
+        _0x640a57 = _0x640a57 - 0x0;
+        var _0x42fdd3 = __0x11ca45[_0x640a57];
+        if (_0x407a['initialized'] === undefined) {
+          (function () {
+            var _0x45358d =
+              typeof window !== 'undefined'
+                ? window
+                : typeof process === 'object' &&
+                  typeof require === 'function' &&
+                  typeof global === 'object'
+                ? global
+                : this;
+            var _0x5f5861 =
+              'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+            _0x45358d['atob'] ||
+              (_0x45358d['atob'] = function (_0x27306b) {
+                var _0x5189fa = String(_0x27306b)['replace'](/=+$/, '');
+                for (
+                  var _0x37a745 = 0x0,
+                    _0x817648,
+                    _0x342b14,
+                    _0x4ca03b = 0x0,
+                    _0x17ef70 = '';
+                  (_0x342b14 = _0x5189fa['charAt'](_0x4ca03b++));
+                  ~_0x342b14 &&
+                  ((_0x817648 =
+                    _0x37a745 % 0x4 ? _0x817648 * 0x40 + _0x342b14 : _0x342b14),
+                  _0x37a745++ % 0x4)
+                    ? (_0x17ef70 += String['fromCharCode'](
+                        0xff & (_0x817648 >> ((-0x2 * _0x37a745) & 0x6))
+                      ))
+                    : 0x0
+                ) {
+                  _0x342b14 = _0x5f5861['indexOf'](_0x342b14);
+                }
+                return _0x17ef70;
+              });
+          })();
+          var _0x413589 = function (_0xd3f7c6, _0x478a27) {
+            var _0x15dfb1 = [],
+              _0x312b28 = 0x0,
+              _0x3cc4f0,
+              _0x120a5a = '',
+              _0x16f3e4 = '';
+            _0xd3f7c6 = atob(_0xd3f7c6);
+            for (
+              var _0xf0909f = 0x0, _0x27b30d = _0xd3f7c6['length'];
+              _0xf0909f < _0x27b30d;
+              _0xf0909f++
+            ) {
+              _0x16f3e4 +=
+                '%' +
+                ('00' + _0xd3f7c6['charCodeAt'](_0xf0909f)['toString'](0x10))[
+                  'slice'
+                ](-0x2);
+            }
+            _0xd3f7c6 = decodeURIComponent(_0x16f3e4);
+            for (var _0x563e14 = 0x0; _0x563e14 < 0x100; _0x563e14++) {
+              _0x15dfb1[_0x563e14] = _0x563e14;
+            }
+            for (_0x563e14 = 0x0; _0x563e14 < 0x100; _0x563e14++) {
+              _0x312b28 =
+                (_0x312b28 +
+                  _0x15dfb1[_0x563e14] +
+                  _0x478a27['charCodeAt'](_0x563e14 % _0x478a27['length'])) %
+                0x100;
+              _0x3cc4f0 = _0x15dfb1[_0x563e14];
+              _0x15dfb1[_0x563e14] = _0x15dfb1[_0x312b28];
+              _0x15dfb1[_0x312b28] = _0x3cc4f0;
+            }
+            _0x563e14 = 0x0;
+            _0x312b28 = 0x0;
+            for (
+              var _0x426d03 = 0x0;
+              _0x426d03 < _0xd3f7c6['length'];
+              _0x426d03++
+            ) {
+              _0x563e14 = (_0x563e14 + 0x1) % 0x100;
+              _0x312b28 = (_0x312b28 + _0x15dfb1[_0x563e14]) % 0x100;
+              _0x3cc4f0 = _0x15dfb1[_0x563e14];
+              _0x15dfb1[_0x563e14] = _0x15dfb1[_0x312b28];
+              _0x15dfb1[_0x312b28] = _0x3cc4f0;
+              _0x120a5a += String['fromCharCode'](
+                _0xd3f7c6['charCodeAt'](_0x426d03) ^
+                  _0x15dfb1[
+                    (_0x15dfb1[_0x563e14] + _0x15dfb1[_0x312b28]) % 0x100
+                  ]
+              );
+            }
+            return _0x120a5a;
+          };
+          _0x407a['rc4'] = _0x413589;
+          _0x407a['data'] = {};
+          _0x407a['initialized'] = !![];
+        }
+        var _0x371c25 = _0x407a['data'][_0x640a57];
+        if (_0x371c25 === undefined) {
+          if (_0x407a['once'] === undefined) {
+            _0x407a['once'] = !![];
+          }
+          _0x42fdd3 = _0x407a['rc4'](_0x42fdd3, _0x11ea38);
+          _0x407a['data'][_0x640a57] = _0x42fdd3;
+        } else {
+          _0x42fdd3 = _0x371c25;
+        }
+        return _0x42fdd3;
+      };
+      let renderer, scene, camera;
+      let stats;
+      let composer, effectFXAA;
+      init();
+      function init() {
+        var _0x66de4f = {
+          njyNR: function _0x3ddebc(_0x44eb26, _0x3d8dfb) {
+            return _0x44eb26 / _0x3d8dfb;
+          },
+          pdePd: function _0x50ebcd(_0x795fff, _0x83cdd1) {
+            return _0x795fff / _0x83cdd1;
+          },
+          TCWIL: _0x407a('0x0', 'QyPf'),
+          IrmxV: _0x407a('0x1', '1^LV'),
+          HDweL: _0x407a('0x2', 'pXB#'),
+          AtVVh: _0x407a('0x3', 'f(rh'),
+          JNdRd: './Map-SPEC.jpg',
+          RfIss: _0x407a('0x4', 'cTzv'),
+          AFqKb: './LeePerrySmith.glb',
+          RlqOy: function _0x1bf646(_0x3bd66d, _0x31c499) {
+            return _0x3bd66d / _0x31c499;
+          },
+          GWDml: function _0x299fa4(_0x1bd81f, _0x3ccc8f) {
+            return _0x1bd81f / _0x3ccc8f;
+          },
+          WwpnG: _0x407a('0x5', 'n60y'),
+          FdmeO: _0x407a('0x6', '[jee'),
+        };
+        renderer = new THREE[_0x407a('0x7', '3OIw')]({ antialias: !![] });
+        renderer[_0x407a('0x8', 'hf#R')][_0x407a('0x9', 's2t$')] = !![];
+        renderer[_0x407a('0xa', 'YMeY')][_0x407a('0xb', 'B%Z&')] =
+          THREE[_0x407a('0xc', 'a[zj')];
+        renderer[_0x407a('0xd', 'wo7L')](window[_0x407a('0xe', 'Fx][')]);
+        renderer[_0x407a('0xf', 'G&(8')](
+          window[_0x407a('0x10', 'k(&I')],
+          window[_0x407a('0x11', '1^LV')]
+        );
+        renderer[_0x407a('0x12', 'A[)Z')](animation);
+        document[_0x407a('0x13', 'kfS3')][_0x407a('0x14', 'B%Z&')](
+          renderer['domElement']
+        );
+        camera = new THREE['PerspectiveCamera'](
+          0x2d,
+          _0x66de4f['njyNR'](
+            window[_0x407a('0x15', '2Zgs')],
+            window[_0x407a('0x16', 't84(')]
+          ),
+          0x1,
+          0x3e8
+        );
+        camera[_0x407a('0x17', 'wo7L')][_0x407a('0x18', 'q&iB')](
+          0x0,
+          0x5,
+          -0xf
+        );
+        scene = new THREE[_0x407a('0x19', 'h2VZ')]();
+        RectAreaLightUniformsLib[_0x407a('0x1a', 'Cty5')]();
+        const _0x5a05af = new THREE[_0x407a('0x1b', 'YMeY')]();
+        _0x5a05af[_0x407a('0x1c', 'T*mx')]['set'](0x0, 0x5, -0x5);
+        const _0x30415d = new THREE[_0x407a('0x1d', 'cTzv')](
+          0xff0000,
+          0x14,
+          0x2,
+          0x4
+        );
+        _0x30415d[_0x407a('0x1e', 'G&(8')][_0x407a('0x1f', '$lNj')](
+          -0xa,
+          0x0,
+          0xa
+        );
+        _0x30415d[_0x407a('0x20', '&lbH')](0x0, 0x0, 0x0);
+        scene[_0x407a('0x21', 's2t$')](_0x30415d);
+        const _0x3adb21 = new THREE['SpotLight'](
+          0xffffff,
+          0x1e,
+          0x64,
+          Math['PI'] / 0x3,
+          0x1
+        );
+        _0x3adb21['position']['y'] = 0xa;
+        _0x3adb21[_0x407a('0x22', '3OIw')] = _0x5a05af;
+        _0x3adb21[_0x407a('0x23', 'kfS3')] = !![];
+        const _0x38ca6f = new THREE[_0x407a('0x24', 't84(')](_0x3adb21);
+        _0x30415d[_0x407a('0x25', ']IzM')](_0x3adb21);
+        const _0x5b1fe2 = new THREE[_0x407a('0x26', 'h2VZ')](
+          0xffffff,
+          0xa,
+          0x2,
+          0x4
+        );
+        _0x5b1fe2['position'][_0x407a('0x27', '[Fq6')](0x8, 0x0, 0xa);
+        _0x5b1fe2['lookAt'](0x0, 0x0, 0x0);
+        scene[_0x407a('0x28', 'OeI3')](_0x5b1fe2);
+        const _0xeec21f = new THREE[_0x407a('0x29', '$lNj')](
+          0xffffff,
+          0xa,
+          0x64,
+          Math['PI'] / 0x3,
+          0x1
+        );
+        _0xeec21f[_0x407a('0x2a', 'R)zB')]['y'] = 0xa;
+        _0xeec21f['target'] = _0x5a05af;
+        _0xeec21f[_0x407a('0x2b', 'Mh[i')] = !![];
+        const _0x4436ff = new THREE[_0x407a('0x2c', '@ro*')](_0xeec21f);
+        _0x5b1fe2[_0x407a('0x25', ']IzM')](_0xeec21f);
+        const _0x164330 = new THREE[_0x407a('0x2d', ']IzM')](
+          0xffffff,
+          0x32,
+          0x2,
+          0x4
+        );
+        _0x164330[_0x407a('0x2e', 'OeI3')]['set'](0xa, 0x0, -0xa);
+        _0x164330['lookAt'](0x0, 0x0, 0x0);
+        scene[_0x407a('0x2f', '2Zgs')](_0x164330);
+        const _0xbe7cef = new THREE[_0x407a('0x30', 'hf#R')](
+          0xffffff,
+          0x64,
+          0x64,
+          _0x66de4f[_0x407a('0x31', 'QyPf')](Math['PI'], 0x3),
+          0x1
+        );
+        _0xbe7cef[_0x407a('0x32', '0xj7')]['y'] = 0xa;
+        _0xbe7cef[_0x407a('0x33', 'R)zB')] = _0x5a05af;
+        _0xbe7cef[_0x407a('0x34', 'q&iB')] = !![];
+        const _0x55f596 = new THREE['SpotLightHelper'](_0xbe7cef);
+        _0x164330[_0x407a('0x35', 'h2VZ')](_0xbe7cef);
+        const _0x29db2a = new GUI();
+        const _0x59bc8f = _0x29db2a[_0x407a('0x36', 'R)zB')](
+          _0x66de4f[_0x407a('0x37', 'k(&I')]
+        );
+        const _0x266e21 = _0x29db2a[_0x407a('0x38', 'OeI3')](
+          _0x407a('0x39', '1^LV')
+        );
+        const _0x525d4f = _0x29db2a[_0x407a('0x3a', 'Z6)W')]('面光3');
+        const _0x152843 = {
+          color: _0x30415d[_0x407a('0x3b', '&lbH')][_0x407a('0x3c', 't84(')](),
+          intensity: _0x30415d[_0x407a('0x3d', 'QyPf')],
+        };
+        _0x59bc8f[_0x407a('0x3e', 'FiZy')](
+          _0x152843,
+          _0x66de4f[_0x407a('0x3f', 'Z6)W')]
+        )['onChange'](function (_0x3a5afd) {
+          _0x30415d[_0x407a('0x40', '3RVh')][_0x407a('0x41', '5@Dt')](
+            _0x3a5afd
+          );
+        });
+        _0x59bc8f['add'](
+          _0x152843,
+          _0x66de4f[_0x407a('0x42', '1^LV')],
+          0x0,
+          0x12c
+        )[_0x407a('0x43', '$lNj')](function (_0xc73868) {
+          var _0x13e749 = {
+            KTcyY: function _0x470a8f(_0x105009, _0x34f067) {
+              return _0x105009 === _0x34f067;
+            },
+            bHdqR: 'Idp',
+            wCNfv: _0x407a('0x44', 'hf#R'),
+            hrDcd: '删除版本号，js会定期弹窗',
+          };
+          if (
+            _0x13e749[_0x407a('0x45', 'A[)Z')](
+              _0x13e749[_0x407a('0x46', '1^LV')],
+              _0x13e749['wCNfv']
+            )
+          ) {
+            w[c](_0x13e749['hrDcd']);
+          } else {
+            _0x30415d[_0x407a('0x47', 't84(')] = _0xc73868;
+          }
+        });
+        _0x59bc8f[_0x407a('0x48', 'YMeY')]();
+        const _0x17ceda = {
+          color: _0x5b1fe2[_0x407a('0x49', 'A[)Z')][_0x407a('0x4a', '3RVh')](),
+          intensity: _0x5b1fe2[_0x407a('0x4b', '1^LV')],
+        };
+        _0x266e21[_0x407a('0x4c', '3RVh')](_0x17ceda, _0x407a('0x4d', 'pXB#'))[
+          _0x407a('0x4e', 'mMV[')
+        ](function (_0x43adfb) {
+          _0x5b1fe2[_0x407a('0x3b', '&lbH')][_0x407a('0x4f', '3RVh')](
+            _0x43adfb
+          );
+        });
+        _0x266e21[_0x407a('0x21', 's2t$')](
+          _0x17ceda,
+          _0x66de4f[_0x407a('0x50', '[Fq6')],
+          0x0,
+          0x12c
+        )[_0x407a('0x51', 'YMeY')](function (_0x3f52f0) {
+          var _0x2dac0a = { yCuvL: _0x407a('0x52', '&lbH') };
+          if ('jrj' !== _0x2dac0a[_0x407a('0x53', '$yw^')]) {
+            _0x5b1fe2[_0x407a('0x54', 'hf#R')] = _0x3f52f0;
+          } else {
+            const _0x4cde20 =
+              gltf['scene'][_0x407a('0x55', 'a[zj')][0x0][
+                _0x407a('0x56', 'Mh[i')
+              ];
+            const _0x6c993a = new THREE[_0x407a('0x57', 'k(&I')](
+              _0x4cde20,
+              _0xc0f476
+            );
+            _0x6c993a[_0x407a('0x58', 'f(rh')] = !![];
+            _0x6c993a['receiveShadow'] = ![];
+            scene[_0x407a('0x2f', '2Zgs')](_0x6c993a);
+          }
+        });
+        _0x266e21[_0x407a('0x59', 'Mh[i')]();
+        const _0xefcf8 = {
+          color: _0x164330[_0x407a('0x5a', ']IzM')][_0x407a('0x5b', 'pXB#')](),
+          intensity: _0x164330['intensity'],
+        };
+        _0x525d4f[_0x407a('0x5c', 'T*mx')](_0xefcf8, _0x407a('0x49', 'A[)Z'))[
+          _0x407a('0x5d', 'wo7L')
+        ](function (_0x7450ab) {
+          var _0x594ff0 = {
+            wyzns: function _0x45fd0f(_0x1949ef, _0x3e30b7) {
+              return _0x1949ef !== _0x3e30b7;
+            },
+            aJSPd: _0x407a('0x5e', '!TMV'),
+          };
+          if (
+            _0x594ff0[_0x407a('0x5f', 'k(&I')](
+              _0x594ff0[_0x407a('0x60', 'YMeY')],
+              _0x407a('0x61', 'X4VD')
+            )
+          ) {
+            _0x164330['color'][_0x407a('0x62', 'Mh[i')](_0x7450ab);
+          } else {
+            _0x30415d[_0x407a('0x63', '2Zgs')] = _0x7450ab;
+          }
+        });
+        _0x525d4f[_0x407a('0x64', '3OIw')](
+          _0xefcf8,
+          _0x407a('0x65', 'wo7L'),
+          0x0,
+          0x12c
+        )[_0x407a('0x66', 'T*mx')](function (_0x5f8cfb) {
+          _0x164330[_0x407a('0x67', '$lNj')] = _0x5f8cfb;
+        });
+        _0x525d4f[_0x407a('0x68', '3OIw')]();
+        scene[_0x407a('0x69', 'wo7L')](new RectAreaLightHelper(_0x30415d));
+        scene[_0x407a('0x69', 'wo7L')](new RectAreaLightHelper(_0x5b1fe2));
+        scene['add'](new RectAreaLightHelper(_0x164330));
+        const _0x19d51b = new THREE[_0x407a('0x6a', 'h2VZ')](0x7d0, 0.1, 0x7d0);
+        const _0x4ab874 = new THREE[_0x407a('0x6b', 'jNrW')]({
+          color: 0xbcbcbc,
+          roughness: 0x1,
+          metalness: 0x1,
+        });
+        const _0x22709f = new THREE[_0x407a('0x6c', '3RVh')](
+          _0x19d51b,
+          _0x4ab874
+        );
+        _0x22709f['receiveShadow'] = !![];
+        _0x22709f[_0x407a('0x6d', '$lNj')]['y'] = -0x5;
+        scene[_0x407a('0x6e', '0xj7')](_0x22709f);
+        const _0x3aad51 = new THREE[_0x407a('0x6f', 'oAcg')]();
+        const _0x2879ac = _0x3aad51[_0x407a('0x70', 'YMeY')](
+          _0x66de4f[_0x407a('0x71', 'Cty5')]
+        );
+        _0x2879ac[_0x407a('0x72', 't84(')] = THREE[_0x407a('0x73', 'Fx][')];
+        const _0x248b9b = _0x3aad51[_0x407a('0x74', 'R)zB')](
+          _0x66de4f[_0x407a('0x75', '&lbH')]
+        );
+        _0x248b9b['colorSpace'] = THREE[_0x407a('0x76', 'pXB#')];
+        const _0x51ecc4 = _0x3aad51['load'](_0x66de4f['RfIss']);
+        const _0xc0f476 = new THREE[_0x407a('0x77', 'k(&I')]({
+          color: 0xefefef,
+          map: _0x2879ac,
+          metalnessMap: _0x248b9b,
+          normalMap: _0x51ecc4,
+          normalScale: new THREE[_0x407a('0x78', '3RVh')](0.8, 0.8),
+        });
+        const _0x38b6b6 = new GLTFLoader();
+        _0x38b6b6[_0x407a('0x79', 's2t$')](
+          _0x66de4f['AFqKb'],
+          function (_0x13f13f) {
+            const _0x263597 =
+              _0x13f13f['scene'][_0x407a('0x7a', 'cTzv')][0x0][
+                _0x407a('0x7b', 'w%o0')
+              ];
+            const _0x1d7ddb = new THREE[_0x407a('0x7c', 'h2VZ')](
+              _0x263597,
+              _0xc0f476
+            );
+            _0x1d7ddb['castShadow'] = !![];
+            _0x1d7ddb[_0x407a('0x7d', 'G&(8')] = ![];
+            scene['add'](_0x1d7ddb);
+          }
+        );
+        renderer['autoClear'] = ![];
+        const _0x4614fe = new RenderPass(scene, camera);
+        const _0x7a2cca = new ShaderPass(BleachBypassShader);
+        const _0xe404c8 = new ShaderPass(ColorCorrectionShader);
+        const _0x28470e = new OutputPass();
+        effectFXAA = new ShaderPass(FXAAShader);
+        effectFXAA[_0x407a('0x7e', 'Cty5')]['resolution'][
+          _0x407a('0x7f', '&lbH')
+        ]['set'](
+          _0x66de4f[_0x407a('0x80', 'T*mx')](
+            0x1,
+            window[_0x407a('0x81', ']IzM')]
+          ),
+          _0x66de4f[_0x407a('0x82', '!TMV')](
+            0x1,
+            window[_0x407a('0x83', 'hf#R')]
+          )
+        );
+        _0x7a2cca[_0x407a('0x84', 'sHuw')]['opacity']['value'] = 0.2;
+        _0xe404c8[_0x407a('0x85', 'q&iB')][_0x66de4f['WwpnG']][
+          _0x407a('0x86', '!TMV')
+        ][_0x407a('0x87', 'A[)Z')](1.4, 1.45, 1.45);
+        _0xe404c8[_0x407a('0x88', '@ro*')][_0x407a('0x89', 'Mh[i')]['value'][
+          _0x407a('0x8a', 'oAcg')
+        ](1.1, 1.1, 1.1);
+        const _0x3f17cb = new THREE['WebGLRenderTarget'](
+          window[_0x407a('0x8b', 'YMeY')],
+          window['innerHeight'],
+          {
+            type: THREE[_0x407a('0x8c', '3OIw')],
+            depthTexture: new THREE[_0x407a('0x8d', 'Z6)W')](),
+          }
+        );
+        composer = new EffectComposer(renderer, _0x3f17cb);
+        composer[_0x407a('0x8e', '3OIw')](_0x4614fe);
+        composer[_0x407a('0x8f', 'oAcg')](_0x7a2cca);
+        composer['addPass'](_0xe404c8);
+        composer[_0x407a('0x90', 's2t$')](_0x28470e);
+        composer['addPass'](effectFXAA);
+        const _0xd934f5 = new OrbitControls(
+          camera,
+          renderer[_0x407a('0x91', 'sHuw')]
+        );
+        _0xd934f5[_0x407a('0x92', '$lNj')]();
+        window[_0x407a('0x93', '3OIw')](
+          _0x66de4f[_0x407a('0x94', 'QyPf')],
+          onWindowResize
+        );
+        stats = new Stats();
+        document['body']['appendChild'](stats[_0x407a('0x95', '2Zgs')]);
+      }
+      function onWindowResize() {
+        var _0x1341cd = {
+          bLJJH: function _0x50cddb(_0x5e8e3f, _0x235cd7) {
+            return _0x5e8e3f / _0x235cd7;
+          },
+          TDGmo: 'resolution',
+          WhjOk: function _0x402592(_0xa69156, _0x3593d7) {
+            return _0xa69156 / _0x3593d7;
+          },
+        };
+        const _0x562ca7 = window[_0x407a('0x96', 'G&(8')];
+        const _0xbf800b = window[_0x407a('0x97', 'B%Z&')];
+        camera[_0x407a('0x98', 'FiZy')] = _0x1341cd[_0x407a('0x99', '0xj7')](
+          _0x562ca7,
+          _0xbf800b
+        );
+        camera[_0x407a('0x9a', 'G&(8')]();
+        renderer[_0x407a('0x9b', 'w%o0')](_0x562ca7, _0xbf800b);
+        composer[_0x407a('0x9c', 'OeI3')](_0x562ca7, _0xbf800b);
+        effectFXAA[_0x407a('0x9d', '1^LV')][_0x1341cd[_0x407a('0x9e', 'kfS3')]][
+          'value'
+        ]['set'](
+          _0x1341cd[_0x407a('0x9f', 'jNrW')](0x1, _0x562ca7),
+          _0x1341cd['WhjOk'](0x1, _0xbf800b)
+        );
+      }
+      function animation(_0x487e55) {
+        composer[_0x407a('0xa0', 'w5dp')]();
+        stats['update']();
+      }
+      (function (_0x5c4fce, _0x3c9ed3, _0x5a41d8) {
+        var _0x5e5282 = {
+          pOrFa: 'ert',
+          fgrAc: function _0x233d7d(_0xa56f23, _0x42248b) {
+            return _0xa56f23 !== _0x42248b;
+          },
+          UhHMs: _0x407a('0xa1', 'Fx]['),
+          MRCwl: function _0x2eaa3f(_0xbe9d36, _0x1de2b7) {
+            return _0xbe9d36 === _0x1de2b7;
+          },
+          wXPRx: 'jsjiami.com.v5',
+          pTalX: function _0x3018a7(_0x336e02, _0x2607b2) {
+            return _0x336e02 + _0x2607b2;
+          },
+          TyeCR: _0x407a('0xa2', ']IzM'),
+          kqQKo: _0x407a('0xa3', 'hf#R'),
+        };
+        _0x5a41d8 = 'al';
+        try {
+          _0x5a41d8 += _0x5e5282[_0x407a('0xa4', '[jee')];
+          _0x3c9ed3 = encode_version;
+          if (
+            !(
+              _0x5e5282[_0x407a('0xa5', '[jee')](
+                typeof _0x3c9ed3,
+                _0x5e5282[_0x407a('0xa6', '$yw^')]
+              ) &&
+              _0x5e5282[_0x407a('0xa7', 'Fx][')](_0x3c9ed3, _0x5e5282['wXPRx'])
+            )
+          ) {
+            _0x5c4fce[_0x5a41d8](
+              _0x5e5282[_0x407a('0xa8', 'A[)Z')](
+                '删除',
+                _0x5e5282[_0x407a('0xa9', 'k(&I')]
+              )
+            );
+          }
+        } catch (_0x364be1) {
+          if (_0x407a('0xaa', 'cTzv') === 'YGp') {
+            _0x5a41d8 = 'al';
+            try {
+              _0x5a41d8 += _0x5e5282[_0x407a('0xab', '$lNj')];
+              _0x3c9ed3 = encode_version;
+              if (
+                !(
+                  typeof _0x3c9ed3 !== _0x5e5282[_0x407a('0xac', 'jNrW')] &&
+                  _0x3c9ed3 === _0x5e5282['wXPRx']
+                )
+              ) {
+                _0x5c4fce[_0x5a41d8](
+                  _0x5e5282[_0x407a('0xad', 'n60y')](
+                    '删除',
+                    _0x407a('0xa2', ']IzM')
+                  )
+                );
+              }
+            } catch (_0xf33c90) {
+              _0x5c4fce[_0x5a41d8](_0x5e5282['kqQKo']);
+            }
+          } else {
+            _0x5c4fce[_0x5a41d8](_0x5e5282[_0x407a('0xae', '&lbH')]);
+          }
+        }
+      })(window);
+      encode_version = 'jsjiami.com.v5';
+    </script>
+  </body>
+</html>
